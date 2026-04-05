@@ -8,56 +8,39 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;background:#f5f5f3;color:#222}
-
-/* ── 헤더 ── */
 .header{background:#fff;border-bottom:0.5px solid #e0e0e0;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.header-title{font-size:15px;font-weight:500}
+.header-title{font-size:15px;font-weight:500;color:#222}
 .header-sub{font-size:11px;color:#888;margin-top:2px}
 .header-btns{display:flex;gap:6px;align-items:center;flex-shrink:0}
-
-/* ── 탭 ── */
 .tabs{display:flex;gap:2px;padding:12px 16px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .tabs::-webkit-scrollbar{display:none}
 .tab{padding:8px 14px;border-radius:8px 8px 0 0;font-size:13px;cursor:pointer;border:0.5px solid transparent;background:transparent;color:#888;white-space:nowrap;flex-shrink:0}
 .tab.active{background:#fff;border-color:#e0e0e0;border-bottom-color:#fff;color:#222;font-weight:500}
-
-/* ── 컨텐츠 ── */
 .content{background:#fff;border:0.5px solid #e0e0e0;border-radius:0 8px 8px 8px;margin:0 16px 24px;padding:16px}
-
-/* ── KPI 그리드 ── */
 .kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
 .kpi{background:#f8f8f6;border-radius:8px;padding:12px 14px}
 .kpi-label{font-size:11px;color:#888;margin-bottom:5px}
-.kpi-val{font-size:18px;font-weight:500;line-height:1.2}
-
-/* ── 섹션 타이틀 ── */
+.kpi-val{font-size:18px;font-weight:500;line-height:1.2;color:#222}
 .section-title{font-size:13px;font-weight:500;color:#444;margin-bottom:12px;padding-bottom:8px;border-bottom:0.5px solid #eee}
-
-/* ── 팀 카드 ── */
 .team-card{border:0.5px solid #e0e0e0;border-radius:10px;overflow:hidden;margin-bottom:16px}
 .team-card-header{background:#f8f8f6;padding:12px 14px;border-bottom:0.5px solid #e0e0e0}
-.team-name{font-weight:500;font-size:13px;margin-bottom:8px}
+.team-name{font-weight:500;font-size:13px;margin-bottom:8px;color:#222}
 .team-stats{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:12px;color:#666}
 .team-stats b{color:#222}
-
-/* ── 테이블 래퍼 (모바일 가로스크롤) ── */
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 14px}
-.table-wrap table{min-width:520px}
 table{width:100%;border-collapse:collapse;font-size:12px}
 th{text-align:left;padding:8px 8px;font-weight:500;color:#999;border-bottom:0.5px solid #eee;white-space:nowrap;font-size:11px}
-td{padding:8px 8px;border-bottom:0.5px solid #f0f0f0;vertical-align:middle;white-space:nowrap}
+td{padding:8px 8px;border-bottom:0.5px solid #f0f0f0;vertical-align:middle;white-space:nowrap;color:#222}
 tr:last-child td{border-bottom:none}
 .num-right{text-align:right}
+.text-center{text-align:center}
 .prog-wrap{background:#eee;border-radius:4px;height:6px;min-width:50px;flex:1}
 .prog-bar{height:6px;border-radius:4px}
-
-/* ── 배지 ── */
-.badge{display:inline-block;padding:2px 5px;border-radius:4px;font-size:11px}
+.badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:500}
 .g{background:#eaf3de;color:#3b6d11}
 .w{background:#faeeda;color:#854f0b}
 .r{background:#fcebeb;color:#a32d2d}
-
-/* ── 버튼 ── */
+.b{background:#e6f1fb;color:#185fa5}
 .btn{padding:7px 12px;border-radius:6px;font-size:12px;cursor:pointer;border:0.5px solid #d0d0d0;background:#fff;color:#444;white-space:nowrap}
 .btn:hover{background:#f5f5f3}
 .btn-primary{background:#222;color:#fff;border-color:#222}
@@ -65,36 +48,29 @@ tr:last-child td{border-bottom:none}
 .btn-danger{color:#e24b4a;border-color:#f0c0c0;background:#fff}
 .btn-danger:hover{background:#fff5f5}
 .btn-sm{padding:4px 10px;font-size:11px}
-
-/* ── 모달 ── */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:flex-end;justify-content:center}
 .modal-bg.open{display:flex}
 .modal{background:#fff;border-radius:16px 16px 0 0;padding:20px 16px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto}
-.modal h2{font-size:15px;font-weight:500;margin-bottom:4px}
+.modal h2{font-size:15px;font-weight:500;margin-bottom:4px;color:#222}
 .modal-sub{font-size:12px;color:#888;margin-bottom:14px}
 .form-row{margin-bottom:12px}
 .form-row label{display:block;font-size:12px;color:#666;margin-bottom:4px}
-.form-row input,.form-row select{width:100%;padding:9px 10px;border:0.5px solid #d0d0d0;border-radius:8px;font-size:14px}
+.form-row input,.form-row select{width:100%;padding:9px 10px;border:0.5px solid #d0d0d0;border-radius:8px;font-size:14px;color:#222;background:#fff}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 .modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-bottom:env(safe-area-inset-bottom)}
-
-/* ── 프로젝트 목록 ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .proj-card{border:0.5px solid #e0e0e0;border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;background:#fff}
 .proj-card:hover{background:#fafafa}
 .proj-card.selected{background:#f5f0ff;border-left:3px solid #7f77dd}
-
-/* ── 프로젝트 상세 ── */
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
 .chart-wrap{position:relative;height:180px;margin:10px 0}
-.cost-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid #f0f0f0;font-size:13px}
+.cost-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid #f0f0f0;font-size:13px;color:#222}
 .cost-row:last-child{border-bottom:none;font-weight:500}
-
-/* ── 기타 ── */
 .empty{color:#bbb;font-size:13px;padding:32px 0;text-align:center}
 .del-btn{background:none;border:none;cursor:pointer;color:#ccc;padding:0 4px;font-size:14px;line-height:1}
 .del-btn:hover{color:#e24b4a}
 .target-row{display:grid;grid-template-columns:100px 1fr 64px 90px 90px 28px;gap:6px;align-items:center;margin-bottom:8px}
-.target-row input,.target-row select{padding:6px 8px;border:0.5px solid #d0d0d0;border-radius:6px;font-size:12px;width:100%}
+.target-row input,.target-row select{padding:6px 8px;border:0.5px solid #d0d0d0;border-radius:6px;font-size:12px;width:100%;color:#222}
 .target-row-header{display:grid;grid-template-columns:100px 1fr 64px 90px 90px 28px;gap:6px;margin-bottom:8px;padding-bottom:6px;border-bottom:0.5px solid #eee}
 .target-row-header span{font-size:11px;color:#999;font-weight:500}
 .loading{display:flex;align-items:center;justify-content:center;padding:48px;color:#aaa;font-size:13px;gap:8px}
@@ -103,8 +79,9 @@ tr:last-child td{border-bottom:none}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:200;opacity:0;transition:opacity 0.3s;white-space:nowrap}
 .toast.show{opacity:1}
 #syncStatus{font-size:11px;color:#aaa}
-
-/* ── 데스크탑 ── */
+.cf-group-header{background:#f8f8f6;font-size:11px;font-weight:500;color:#666;padding:6px 8px;border-bottom:0.5px solid #eee}
+.cf-group-header th{background:#f8f8f6;color:#666;font-size:11px;text-align:center;padding:4px 8px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
 @media(min-width:768px){
   .header{padding:14px 24px}
   .header-title{font-size:16px}
@@ -116,7 +93,6 @@ tr:last-child td{border-bottom:none}
   .modal{border-radius:12px;padding:24px;max-height:85vh}
   .proj-cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
   .table-wrap{padding:0 16px}
-  .table-wrap table{min-width:auto}
 }
 </style>
 </head>
@@ -129,8 +105,8 @@ tr:last-child td{border-bottom:none}
   </div>
   <div class="header-btns">
     <span id="syncStatus"></span>
-    <button class="btn" onclick="openTargetModal()">목표 설정</button>
-    <button class="btn btn-primary" onclick="openProjModal()">+ 추가</button>
+    <button class="btn" id="mainActionBtn" onclick="handleMainAction()">목표 설정</button>
+    <button class="btn btn-primary" id="addActionBtn" onclick="handleAddAction()">+ 추가</button>
   </div>
 </div>
 
@@ -138,6 +114,7 @@ tr:last-child td{border-bottom:none}
   <button class="tab active" onclick="switchTab('overview',this)">전체 현황</button>
   <button class="tab" onclick="switchTab('targets',this)">팀별 목표</button>
   <button class="tab" onclick="switchTab('projects',this)">프로젝트 관리</button>
+  <button class="tab" onclick="switchTab('cashflow',this)">현금흐름</button>
 </div>
 
 <div class="content">
@@ -148,20 +125,68 @@ tr:last-child td{border-bottom:none}
   </div>
   <div id="tab-targets" style="display:none">
     <div class="section-title">팀별 목표 현황</div>
-    <div id="targetContainer"><div class="loading"><div class="spinner"></div></div></div>
+    <div id="targetContainer"></div>
   </div>
   <div id="tab-projects" style="display:none">
     <div class="proj-cols">
       <div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
           <div class="section-title" style="margin:0;border:none;padding:0">프로젝트 목록</div>
-          <select id="filterUnit" style="font-size:12px;padding:5px 8px;border:0.5px solid #d0d0d0;border-radius:6px;max-width:130px" onchange="renderProjects()">
+          <select id="filterUnit" style="font-size:12px;padding:5px 8px;border:0.5px solid #d0d0d0;border-radius:6px;max-width:130px;color:#222;background:#fff" onchange="renderProjects()">
             <option value="">전체 사업항목</option>
           </select>
         </div>
         <div id="projList"></div>
       </div>
       <div id="projDetail"><div class="empty">프로젝트를 선택하면<br>세부 내역이 표시됩니다</div></div>
+    </div>
+  </div>
+  <div id="tab-cashflow" style="display:none">
+    <div class="kpi-grid" id="cfKpiGrid"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="section-title" style="margin:0;border:none;padding:0">계약별 현금흐름</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="cfFilterUnit" style="font-size:12px;padding:5px 8px;border:0.5px solid #d0d0d0;border-radius:6px;color:#222;background:#fff" onchange="renderCashflow()">
+          <option value="">전체 사업항목</option>
+        </select>
+      </div>
+    </div>
+    <div class="table-wrap" style="padding:0">
+      <table id="cfTable" style="min-width:900px">
+        <thead>
+          <tr style="background:#f8f8f6">
+            <th rowspan="2" style="border-right:0.5px solid #eee;min-width:90px">사업항목</th>
+            <th rowspan="2" style="border-right:0.5px solid #eee;min-width:80px">고객사</th>
+            <th rowspan="2" style="border-right:0.5px solid #eee;min-width:160px">프로젝트명</th>
+            <th rowspan="2" style="border-right:0.5px solid #eee">담당자</th>
+            <th rowspan="2" style="border-right:0.5px solid #eee">계약일</th>
+            <th rowspan="2" class="num-right" style="border-right:0.5px solid #eee">총액(백만)</th>
+            <th colspan="3" class="text-center" style="border-right:0.5px solid #eee;border-bottom:0.5px solid #eee;background:#f0eeff;color:#534ab7">선금</th>
+            <th colspan="3" class="text-center" style="border-right:0.5px solid #eee;border-bottom:0.5px solid #eee;background:#e1f5ee;color:#0f6e56">중도금</th>
+            <th colspan="3" class="text-center" style="border-right:0.5px solid #eee;border-bottom:0.5px solid #eee;background:#faeeda;color:#854f0b">잔금</th>
+            <th rowspan="2" class="text-center" style="min-width:90px">수령률</th>
+            <th rowspan="2" class="text-center">관리</th>
+          </tr>
+          <tr style="background:#f8f8f6">
+            <th class="num-right" style="background:#f0eeff;color:#534ab7">금액</th>
+            <th class="text-center" style="background:#f0eeff;color:#534ab7;font-size:10px">예정일</th>
+            <th class="text-center" style="border-right:0.5px solid #eee;background:#f0eeff;color:#534ab7;font-size:10px">수령일</th>
+            <th class="num-right" style="background:#e1f5ee;color:#0f6e56">금액</th>
+            <th class="text-center" style="background:#e1f5ee;color:#0f6e56;font-size:10px">예정일</th>
+            <th class="text-center" style="border-right:0.5px solid #eee;background:#e1f5ee;color:#0f6e56;font-size:10px">수령일</th>
+            <th class="num-right" style="background:#faeeda;color:#854f0b">금액</th>
+            <th class="text-center" style="background:#faeeda;color:#854f0b;font-size:10px">예정일</th>
+            <th class="text-center" style="border-right:0.5px solid #eee;background:#faeeda;color:#854f0b;font-size:10px">수령일</th>
+          </tr>
+        </thead>
+        <tbody id="cfTableBody"><tr><td colspan="17" class="empty">데이터가 없습니다</td></tr></tbody>
+      </table>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:12px;font-size:11px;color:#888;flex-wrap:wrap">
+      <span><span class="badge g" style="font-size:10px">완료</span> 실제 수령일 입력됨</span>
+      <span><span class="badge r" style="font-size:10px">지연</span> 예정일 경과 + 미수령</span>
+      <span><span class="badge b" style="font-size:10px">예정</span> 수령 예정</span>
+      <span style="color:#ccc">해당없음 = 금액 0 또는 미입력</span>
     </div>
   </div>
 </div>
@@ -206,6 +231,54 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
+<!-- 현금흐름 모달 -->
+<div class="modal-bg" id="cfModal">
+  <div class="modal">
+    <h2 id="cfModalTitle">계약 추가</h2>
+    <div class="modal-sub">금액 단위: 백만원 · 날짜 형식: YYYY-MM-DD</div>
+    <div class="form-grid">
+      <div class="form-row"><label>사업항목</label><select id="cf_unit"></select></div>
+      <div class="form-row"><label>담당자</label><input type="text" id="cf_manager" placeholder="홍길동"></div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row"><label>고객사</label><input type="text" id="cf_client" placeholder="고객사명"></div>
+      <div class="form-row"><label>계약일</label><input type="date" id="cf_contract_date"></div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row"><label>프로젝트명</label><input type="text" id="cf_project_name" placeholder="프로젝트명 입력"></div>
+      <div class="form-row"><label>총 계약금액(백만원)</label><input type="number" id="cf_total" placeholder="0" inputmode="numeric"></div>
+    </div>
+    <div style="background:#f0eeff;border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:500;color:#534ab7;margin-bottom:8px">선금</div>
+      <div class="form-grid-3">
+        <div class="form-row" style="margin:0"><label>금액(백만원)</label><input type="number" id="cf_adv_amt" placeholder="0" inputmode="numeric"></div>
+        <div class="form-row" style="margin:0"><label>수령 예정일</label><input type="date" id="cf_adv_due"></div>
+        <div class="form-row" style="margin:0"><label>실제 수령일</label><input type="date" id="cf_adv_rcv"></div>
+      </div>
+    </div>
+    <div style="background:#e1f5ee;border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:500;color:#0f6e56;margin-bottom:8px">중도금</div>
+      <div class="form-grid-3">
+        <div class="form-row" style="margin:0"><label>금액(백만원)</label><input type="number" id="cf_int_amt" placeholder="0" inputmode="numeric"></div>
+        <div class="form-row" style="margin:0"><label>수령 예정일</label><input type="date" id="cf_int_due"></div>
+        <div class="form-row" style="margin:0"><label>실제 수령일</label><input type="date" id="cf_int_rcv"></div>
+      </div>
+    </div>
+    <div style="background:#faeeda;border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:500;color:#854f0b;margin-bottom:8px">잔금</div>
+      <div class="form-grid-3">
+        <div class="form-row" style="margin:0"><label>금액(백만원)</label><input type="number" id="cf_bal_amt" placeholder="0" inputmode="numeric"></div>
+        <div class="form-row" style="margin:0"><label>수령 예정일</label><input type="date" id="cf_bal_due"></div>
+        <div class="form-row" style="margin:0"><label>실제 수령일</label><input type="date" id="cf_bal_rcv"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('cfModal')">취소</button>
+      <button class="btn btn-primary" id="saveCfBtn" onclick="saveCashflow()">저장</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -213,27 +286,50 @@ const SUPABASE_URL='https://mxgmvhhdwcnvzhncboix.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z212aGhkd2NudnpobmNib2l4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzODUyNzEsImV4cCI6MjA5MDk2MTI3MX0.wMDAO92ETeSM7oLFyESsNFcpar6gOMPJA4DC-0cBrRg';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const TEAMS=['해외사업팀','마케팅팀','컨설팅팀'];
-let targets=[],projects=[],selectedProjId=null,editingProjId=null,costChart=null,costRowIdx=0,targetRows=[];
+const TODAY=new Date(); TODAY.setHours(0,0,0,0);
+
+let targets=[],projects=[],cashflows=[],selectedProjId=null,editingProjId=null,editingCfId=null,costChart=null,costRowIdx=0,targetRows=[],currentTab='overview';
 
 const fmtB=n=>Number(n||0).toLocaleString('ko-KR',{minimumFractionDigits:1,maximumFractionDigits:1});
-const fmtN=n=>Number(n||0).toLocaleString('ko-KR');
 const pct=(a,b)=>b>0?Math.round(a/b*100):0;
 const bc=r=>r>=1?'g':r>=0.7?'w':'r';
+const fmtDate=d=>d?d.slice(0,10).replace(/-/g,'.'):'—';
+
+function payStatus(due, received){
+  if(received) return {label:'완료', cls:'g', date: fmtDate(received)};
+  if(!due) return null;
+  const d=new Date(due); d.setHours(0,0,0,0);
+  if(d<TODAY) return {label:'지연', cls:'r', date: fmtDate(due)};
+  return {label:'예정', cls:'b', date: fmtDate(due)};
+}
+function payBadge(due, received){
+  const s=payStatus(due,received);
+  if(!s) return '<span style="color:#ccc;font-size:11px">—</span>';
+  return `<span class="badge ${s.cls}" style="font-size:10px">${s.label}</span><br><span style="font-size:10px;color:#888">${s.date}</span>`;
+}
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 function setSync(msg){document.getElementById('syncStatus').textContent=msg;}
 
+/* ── Supabase ── */
 async function loadAll(){
   setSync('동기화 중...');
-  const [tRes,pRes]=await Promise.all([sb.from('targets').select('*').order('id'),sb.from('projects').select('*').order('id')]);
+  const [tRes,pRes,cRes]=await Promise.all([
+    sb.from('targets').select('*').order('id'),
+    sb.from('projects').select('*').order('id'),
+    sb.from('cashflow').select('*').order('id')
+  ]);
   if(tRes.error||pRes.error){setSync('오류');return;}
   targets=tRes.data;
   projects=pRes.data.map(p=>({...p,costs:p.costs||[]}));
-  setSync('');buildFilterSelect();renderAll();
+  cashflows=cRes.data||[];
+  setSync('');
+  buildFilterSelects();
+  renderAll();
 }
-async function upsertTarget(row){const {error}=await sb.from('targets').upsert({id:row.id,team:row.team,unit:row.unit,cnt:row.cnt,revenue:row.revenue,profit:row.profit},{onConflict:'id'});return !error;}
+async function upsertTarget(row){await sb.from('targets').upsert({id:row.id,team:row.team,unit:row.unit,cnt:row.cnt,revenue:row.revenue,profit:row.profit},{onConflict:'id'});}
 async function deleteTarget(id){await sb.from('targets').delete().eq('id',id);}
-async function insertTarget(row){const {data,error}=await sb.from('targets').insert({team:row.team,unit:row.unit,cnt:row.cnt,revenue:row.revenue,profit:row.profit}).select().single();return error?null:data;}
+async function insertTarget(row){const {data}=await sb.from('targets').insert({team:row.team,unit:row.unit,cnt:row.cnt,revenue:row.revenue,profit:row.profit}).select().single();return data;}
 
 function allUnits(){return[...new Set(targets.map(t=>t.unit))];}
 function getStructure(){const s={};TEAMS.forEach(t=>s[t]=[]);targets.forEach(t=>{if(!s[t.team])s[t.team]=[];if(!s[t.team].includes(t.unit))s[t.team].push(t.unit);});return s;}
@@ -245,6 +341,27 @@ function getStats(unit){
   return{cnt:ps.length,revenue,cost,profit:revenue-cost};
 }
 
+/* ── 탭 전환 ── */
+function handleMainAction(){
+  if(currentTab==='cashflow') return;
+  openTargetModal();
+}
+function handleAddAction(){
+  if(currentTab==='cashflow'){openCfModal();return;}
+  openProjModal();
+}
+function switchTab(tab,btn){
+  currentTab=tab;
+  ['overview','targets','projects','cashflow'].forEach(t=>document.getElementById('tab-'+t).style.display=t===tab?'block':'none');
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const mainBtn=document.getElementById('mainActionBtn');
+  const addBtn=document.getElementById('addActionBtn');
+  if(tab==='cashflow'){mainBtn.style.display='none';addBtn.textContent='+ 계약 추가';}
+  else{mainBtn.style.display='';addBtn.textContent='+ 추가';}
+}
+
+/* ── KPI ── */
 function renderKPI(){
   let totRev=0,totTgtRev=0,totTgtProfit=0,totCost=0,totTgtCnt=0;
   allUnits().forEach(u=>{const t=getTarget(u);totTgtCnt+=t.cnt||0;totTgtRev+=Number(t.revenue)||0;totTgtProfit+=Number(t.profit)||0;});
@@ -258,6 +375,7 @@ function renderKPI(){
     <div class="kpi"><div class="kpi-label">수주 건수</div><div class="kpi-val">${projects.length}<span style="font-size:11px;font-weight:400"> 건</span></div><span class="badge ${bc(rCnt)}" style="margin-top:5px;display:inline-block">${pct(projects.length,totTgtCnt)}% · 목표 ${totTgtCnt}건</span></div>`;
 }
 
+/* ── 전체 현황 ── */
 function renderSummary(){
   const structure=getStructure();let html='';
   Object.entries(structure).forEach(([team,units])=>{
@@ -268,8 +386,7 @@ function renderSummary(){
     const unitRows=units.map(u=>{
       const t=getTarget(u),s=getStats(u);
       const ur=Number(t.revenue)>0?s.revenue/Number(t.revenue):0,up=Math.round(ur*100);
-      return`<tr>
-        <td style="color:#444;padding-left:12px">${u}</td>
+      return`<tr><td style="color:#444;padding-left:12px">${u}</td>
         <td class="num-right">${t.cnt}</td><td class="num-right">${s.cnt}</td>
         <td class="num-right">${fmtB(t.revenue)}</td><td class="num-right">${fmtB(s.revenue)}</td>
         <td class="num-right">${fmtB(t.profit)}</td>
@@ -290,21 +407,18 @@ function renderSummary(){
           <span>이익 <b style="color:${tProfit>=0?'#3b6d11':'#a32d2d'}">${fmtB(tProfit)}</b>백만</span>
         </div>
       </div>
-      <div class="table-wrap"><table>
-        <thead><tr>
-          <th style="padding-left:12px">사업항목</th>
-          <th class="num-right">목표건</th><th class="num-right">실적건</th>
-          <th class="num-right">목표매출</th><th class="num-right">실적매출</th>
-          <th class="num-right">목표이윤</th><th class="num-right">예상이윤</th>
-          <th class="num-right">지출</th><th style="width:90px">달성률</th>
-        </tr></thead>
-        <tbody>${unitRows}</tbody>
-      </table></div>
-    </div>`;
+      <div class="table-wrap"><table><thead><tr>
+        <th style="padding-left:12px">사업항목</th>
+        <th class="num-right">목표건</th><th class="num-right">실적건</th>
+        <th class="num-right">목표매출</th><th class="num-right">실적매출</th>
+        <th class="num-right">목표이윤</th><th class="num-right">예상이윤</th>
+        <th class="num-right">지출</th><th style="width:90px">달성률</th>
+      </tr></thead><tbody>${unitRows}</tbody></table></div></div>`;
   });
   document.getElementById('summaryContainer').innerHTML=html||'<div class="empty">목표 설정에서 사업항목을 추가해주세요</div>';
 }
 
+/* ── 팀별 목표 ── */
 function renderTargetTab(){
   const structure=getStructure();let html='';
   Object.entries(structure).forEach(([team,units])=>{
@@ -313,8 +427,7 @@ function renderTargetTab(){
       const t=getTarget(u),s=getStats(u);
       const ur=Number(t.revenue)>0?s.revenue/Number(t.revenue):0,up=Math.round(ur*100);
       const cr=t.cnt>0?s.cnt/t.cnt:0,cp=Math.round(cr*100);
-      return`<tr>
-        <td style="padding-left:12px">${u}</td>
+      return`<tr><td style="padding-left:12px">${u}</td>
         <td class="num-right">${t.cnt}</td><td class="num-right">${fmtB(t.revenue)}</td><td class="num-right">${fmtB(t.profit)}</td>
         <td class="num-right">${s.cnt} <span class="badge ${bc(cr)}">${cp}%</span></td>
         <td class="num-right">${fmtB(s.revenue)} <span class="badge ${bc(ur)}">${up}%</span></td>
@@ -326,20 +439,164 @@ function renderTargetTab(){
     }).join('');
     html+=`<div class="team-card">
       <div class="team-card-header"><div class="team-name">${team}</div></div>
-      <div class="table-wrap"><table>
-        <thead><tr>
-          <th style="padding-left:12px">사업항목</th>
-          <th class="num-right">목표건</th><th class="num-right">목표매출</th><th class="num-right">목표이윤</th>
-          <th class="num-right">실적건</th><th class="num-right">실적매출</th><th class="num-right">예상이윤</th>
-          <th style="width:90px">달성률</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table></div>
-    </div>`;
+      <div class="table-wrap"><table><thead><tr>
+        <th style="padding-left:12px">사업항목</th>
+        <th class="num-right">목표건</th><th class="num-right">목표매출</th><th class="num-right">목표이윤</th>
+        <th class="num-right">실적건</th><th class="num-right">실적매출</th><th class="num-right">예상이윤</th>
+        <th style="width:90px">달성률</th>
+      </tr></thead><tbody>${rows}</tbody></table></div></div>`;
   });
   document.getElementById('targetContainer').innerHTML=html||'<div class="empty">목표 설정에서 사업항목을 추가해주세요</div>';
 }
 
+/* ── 현금흐름 KPI ── */
+function renderCfKPI(){
+  let total=0,received=0,delayed=0;
+  cashflows.forEach(cf=>{
+    total+=Number(cf.total_amount||0);
+    if(cf.advance_received) received+=Number(cf.advance_amount||0);
+    if(cf.interim_received) received+=Number(cf.interim_amount||0);
+    if(cf.balance_received) received+=Number(cf.balance_amount||0);
+    const checks=[
+      {due:cf.advance_due,rcv:cf.advance_received,amt:cf.advance_amount},
+      {due:cf.interim_due,rcv:cf.interim_received,amt:cf.interim_amount},
+      {due:cf.balance_due,rcv:cf.balance_received,amt:cf.balance_amount}
+    ];
+    checks.forEach(c=>{
+      if(c.amt&&c.due&&!c.rcv){const d=new Date(c.due);d.setHours(0,0,0,0);if(d<TODAY)delayed++;}
+    });
+  });
+  const pending=total-received;
+  const rRate=total>0?received/total:0;
+  document.getElementById('cfKpiGrid').innerHTML=`
+    <div class="kpi"><div class="kpi-label">총 계약금액</div><div class="kpi-val">${fmtB(total)}<span style="font-size:11px;font-weight:400"> 백만원</span></div><div style="font-size:11px;color:#888;margin-top:5px">${cashflows.length}개 계약</div></div>
+    <div class="kpi"><div class="kpi-label">수령 완료</div><div class="kpi-val" style="color:#3b6d11">${fmtB(received)}<span style="font-size:11px;font-weight:400"> 백만원</span></div><span class="badge g" style="margin-top:5px;display:inline-block">${pct(received,total)}% 수령</span></div>
+    <div class="kpi"><div class="kpi-label">미수령 잔액</div><div class="kpi-val" style="color:#185fa5">${fmtB(pending)}<span style="font-size:11px;font-weight:400"> 백만원</span></div><div style="font-size:11px;color:#888;margin-top:5px">${pct(pending,total)}% 미수령</div></div>
+    <div class="kpi"><div class="kpi-label">지연 수령</div><div class="kpi-val" style="color:${delayed>0?'#a32d2d':'#3b6d11'}">${delayed}<span style="font-size:11px;font-weight:400"> 건</span></div><div style="font-size:11px;color:${delayed>0?'#a32d2d':'#888'};margin-top:5px">${delayed>0?'즉시 확인 필요':'지연 없음'}</div></div>`;
+}
+
+/* ── 현금흐름 테이블 ── */
+function renderCashflow(){
+  renderCfKPI();
+  const filter=document.getElementById('cfFilterUnit').value;
+  const cfs=filter?cashflows.filter(c=>c.unit===filter):cashflows;
+  const tbody=document.getElementById('cfTableBody');
+  if(!cfs.length){tbody.innerHTML='<tr><td colspan="17" class="empty">계약 데이터가 없습니다</td></tr>';return;}
+  tbody.innerHTML=cfs.map(cf=>{
+    const advAmt=Number(cf.advance_amount||0),intAmt=Number(cf.interim_amount||0),balAmt=Number(cf.balance_amount||0);
+    const rcvd=(cf.advance_received?advAmt:0)+(cf.interim_received?intAmt:0)+(cf.balance_received?balAmt:0);
+    const tot=Number(cf.total_amount||0);
+    const rate=tot>0?Math.round(rcvd/tot*100):0;
+    const rateColor=rate>=100?'#3b6d11':rate>=50?'#854f0b':'#185fa5';
+
+    const payCell=(amt,due,rcv)=>{
+      if(!amt) return '<td class="num-right" style="color:#ccc">—</td><td class="text-center" colspan="2" style="color:#ccc;font-size:11px">해당없음</td>';
+      return `<td class="num-right">${fmtB(amt)}</td><td class="text-center">${payBadge(due,rcv)}</td><td class="text-center">${rcv?`<span style="font-size:10px;color:#3b6d11">${fmtDate(rcv)}</span>`:'<span style="color:#ccc;font-size:11px">—</span>'}</td>`;
+    };
+
+    return`<tr>
+      <td style="font-size:11px;color:#666">${cf.unit||'—'}</td>
+      <td style="font-weight:500">${cf.client||'—'}</td>
+      <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;color:#444" title="${cf.project_name||''}">${cf.project_name||'—'}</td>
+      <td style="color:#666">${cf.manager||'—'}</td>
+      <td style="color:#888;font-size:11px">${fmtDate(cf.contract_date)}</td>
+      <td class="num-right" style="font-weight:500;border-right:0.5px solid #eee">${fmtB(cf.total_amount)}</td>
+      ${payCell(advAmt,cf.advance_due,cf.advance_received)}
+      <td style="border-right:0.5px solid #eee"></td>
+      ${payCell(intAmt,cf.interim_due,cf.interim_received)}
+      <td style="border-right:0.5px solid #eee"></td>
+      ${payCell(balAmt,cf.balance_due,cf.balance_received)}
+      <td style="border-right:0.5px solid #eee"></td>
+      <td class="text-center">
+        <div style="display:flex;align-items:center;gap:4px;justify-content:center">
+          <div class="prog-wrap" style="min-width:40px"><div class="prog-bar" style="width:${rate}%;background:${rateColor}"></div></div>
+          <span style="font-size:11px;min-width:28px;color:${rateColor}">${rate}%</span>
+        </div>
+      </td>
+      <td class="text-center">
+        <div style="display:flex;gap:4px;justify-content:center">
+          <button class="btn btn-sm" onclick="editCashflow(${cf.id})">수정</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteCashflow(${cf.id})">삭제</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── 현금흐름 CRUD ── */
+function openCfModal(){
+  editingCfId=null;
+  document.getElementById('cfModalTitle').textContent='계약 추가';
+  buildCfUnitSelect();
+  ['cf_manager','cf_client','cf_project_name','cf_contract_date',
+   'cf_total','cf_adv_amt','cf_adv_due','cf_adv_rcv',
+   'cf_int_amt','cf_int_due','cf_int_rcv',
+   'cf_bal_amt','cf_bal_due','cf_bal_rcv'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('cfModal').classList.add('open');
+}
+function editCashflow(id){
+  const cf=cashflows.find(c=>c.id===id);if(!cf)return;
+  editingCfId=id;
+  document.getElementById('cfModalTitle').textContent='계약 수정';
+  buildCfUnitSelect();
+  document.getElementById('cf_unit').value=cf.unit||'';
+  document.getElementById('cf_manager').value=cf.manager||'';
+  document.getElementById('cf_client').value=cf.client||'';
+  document.getElementById('cf_project_name').value=cf.project_name||'';
+  document.getElementById('cf_contract_date').value=cf.contract_date||'';
+  document.getElementById('cf_total').value=cf.total_amount||'';
+  document.getElementById('cf_adv_amt').value=cf.advance_amount||'';
+  document.getElementById('cf_adv_due').value=cf.advance_due||'';
+  document.getElementById('cf_adv_rcv').value=cf.advance_received||'';
+  document.getElementById('cf_int_amt').value=cf.interim_amount||'';
+  document.getElementById('cf_int_due').value=cf.interim_due||'';
+  document.getElementById('cf_int_rcv').value=cf.interim_received||'';
+  document.getElementById('cf_bal_amt').value=cf.balance_amount||'';
+  document.getElementById('cf_bal_due').value=cf.balance_due||'';
+  document.getElementById('cf_bal_rcv').value=cf.balance_received||'';
+  document.getElementById('cfModal').classList.add('open');
+}
+function buildCfUnitSelect(){
+  document.getElementById('cf_unit').innerHTML=allUnits().map(u=>`<option value="${u}">${u}</option>`).join('');
+}
+async function saveCashflow(){
+  const payload={
+    unit:document.getElementById('cf_unit').value,
+    client:document.getElementById('cf_client').value.trim(),
+    project_name:document.getElementById('cf_project_name').value.trim(),
+    manager:document.getElementById('cf_manager').value.trim(),
+    contract_date:document.getElementById('cf_contract_date').value||null,
+    total_amount:Number(document.getElementById('cf_total').value)||0,
+    advance_amount:Number(document.getElementById('cf_adv_amt').value)||0,
+    advance_due:document.getElementById('cf_adv_due').value||null,
+    advance_received:document.getElementById('cf_adv_rcv').value||null,
+    interim_amount:Number(document.getElementById('cf_int_amt').value)||0,
+    interim_due:document.getElementById('cf_int_due').value||null,
+    interim_received:document.getElementById('cf_int_rcv').value||null,
+    balance_amount:Number(document.getElementById('cf_bal_amt').value)||0,
+    balance_due:document.getElementById('cf_bal_due').value||null,
+    balance_received:document.getElementById('cf_bal_rcv').value||null
+  };
+  if(!payload.project_name){alert('프로젝트명을 입력해주세요');return;}
+  const btn=document.getElementById('saveCfBtn');btn.textContent='저장 중...';btn.disabled=true;
+  if(editingCfId){
+    const {error}=await sb.from('cashflow').update(payload).eq('id',editingCfId);
+    if(!error){const i=cashflows.findIndex(c=>c.id===editingCfId);cashflows[i]={...cashflows[i],...payload};}
+  } else {
+    const {data,error}=await sb.from('cashflow').insert(payload).select().single();
+    if(!error)cashflows.push(data);
+  }
+  btn.textContent='저장';btn.disabled=false;
+  closeModal('cfModal');renderCashflow();showToast('저장되었습니다');
+}
+async function deleteCashflow(id){
+  if(!confirm('이 계약을 삭제하시겠습니까?'))return;
+  await sb.from('cashflow').delete().eq('id',id);
+  cashflows=cashflows.filter(c=>c.id!==id);
+  renderCashflow();showToast('삭제되었습니다');
+}
+
+/* ── 목표 설정 모달 ── */
 function openTargetModal(){targetRows=targets.map(t=>({...t}));renderTargetEditRows();document.getElementById('targetModal').classList.add('open');}
 function renderTargetEditRows(){
   document.getElementById('targetEditRows').innerHTML=targetRows.map((row,i)=>`
@@ -363,7 +620,6 @@ async function saveTargets(){
   });
   const valid=targetRows.filter(r=>r.unit);
   const btn=document.getElementById('saveTargetBtn');btn.textContent='저장 중...';btn.disabled=true;
-  setSync('저장 중...');
   const removedIds=targets.filter(t=>!valid.find(v=>v.id===t.id)).map(t=>t.id).filter(Boolean);
   await Promise.all(removedIds.map(id=>deleteTarget(id)));
   for(const row of valid){if(row.id){await upsertTarget(row);}else{const res=await insertTarget(row);if(res)row.id=res.id;}}
@@ -371,7 +627,12 @@ async function saveTargets(){
   closeModal('targetModal');await loadAll();showToast('목표가 저장되었습니다');
 }
 
-function buildFilterSelect(){document.getElementById('filterUnit').innerHTML=`<option value="">전체 사업항목</option>`+allUnits().map(u=>`<option value="${u}">${u}</option>`).join('');}
+/* ── 프로젝트 탭 ── */
+function buildFilterSelects(){
+  const opts=`<option value="">전체 사업항목</option>`+allUnits().map(u=>`<option value="${u}">${u}</option>`).join('');
+  document.getElementById('filterUnit').innerHTML=opts;
+  document.getElementById('cfFilterUnit').innerHTML=opts;
+}
 function renderProjects(){
   const filter=document.getElementById('filterUnit').value;
   const ps=filter?projects.filter(p=>p.unit===filter):projects;
@@ -388,14 +649,12 @@ function renderProjects(){
           <div style="font-size:13px;font-weight:500">${fmtB(p.revenue)}백만</div>
           <span class="badge ${bc(r)}" style="font-size:10px;margin-top:3px;display:inline-block">이익률 ${Math.round(r*100)}%</span>
         </div>
-      </div>
-    </div>`;
+      </div></div>`;
   }).join('');
 }
 function selectProject(id){
   selectedProjId=id;renderProjects();renderDetail();
-  // 모바일: 상세로 스크롤
-  if(window.innerWidth<768){document.getElementById('projDetail').scrollIntoView({behavior:'smooth',block:'start'});}
+  if(window.innerWidth<768)document.getElementById('projDetail').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function renderDetail(){
   const el=document.getElementById('projDetail');
@@ -462,8 +721,8 @@ function addCostRow(name='',amt=''){
   const id='cr_'+(costRowIdx++);
   const d=document.createElement('div');
   d.id=id;d.style.cssText='display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center';
-  d.innerHTML=`<input type="text" placeholder="항목명" value="${name}" style="padding:8px 10px;border:0.5px solid #d0d0d0;border-radius:6px;font-size:14px">
-    <input type="number" placeholder="금액(백만)" value="${amt}" inputmode="numeric" style="padding:8px 10px;border:0.5px solid #d0d0d0;border-radius:6px;font-size:14px">
+  d.innerHTML=`<input type="text" placeholder="항목명" value="${name}" style="padding:8px 10px;border:0.5px solid #d0d0d0;border-radius:6px;font-size:14px;color:#222">
+    <input type="number" placeholder="금액(백만)" value="${amt}" inputmode="numeric" style="padding:8px 10px;border:0.5px solid #d0d0d0;border-radius:6px;font-size:14px;color:#222">
     <button class="del-btn" onclick="document.getElementById('${id}').remove()">✕</button>`;
   document.getElementById('costItems').appendChild(d);
 }
@@ -489,12 +748,9 @@ async function saveProject(){
   btn.textContent='저장';btn.disabled=false;
   closeModal('projModal');renderAll();showToast('저장되었습니다');
 }
+
 function closeModal(id){document.getElementById(id).classList.remove('open')}
-function switchTab(tab,btn){
-  ['overview','targets','projects'].forEach(t=>document.getElementById('tab-'+t).style.display=t===tab?'block':'none');
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
-}
-function renderAll(){renderKPI();renderSummary();renderTargetTab();renderProjects();if(selectedProjId)renderDetail();}
+function renderAll(){renderKPI();renderSummary();renderTargetTab();renderProjects();renderCashflow();if(selectedProjId)renderDetail();}
 document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
 loadAll();
 </script>
