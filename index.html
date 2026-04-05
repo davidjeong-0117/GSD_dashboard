@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;background:#f5f5f3;color:#222}
@@ -15,7 +16,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
 .kpi{background:#f8f8f6;border-radius:8px;padding:14px 16px}
 .kpi-label{font-size:11px;color:#888;margin-bottom:6px}
-.kpi-val{font-size:22px;font-weight:500}
+.kpi-val{font-size:20px;font-weight:500}
 .section-title{font-size:13px;font-weight:500;color:#444;margin-bottom:12px;padding-bottom:8px;border-bottom:0.5px solid #eee}
 .team-card{border:0.5px solid #e0e0e0;border-radius:10px;overflow:hidden;margin-bottom:16px}
 .team-card-header{background:#f8f8f6;padding:12px 16px;border-bottom:0.5px solid #e0e0e0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
@@ -37,10 +38,13 @@ tr:last-child td{border-bottom:none}
 .btn:hover{background:#f5f5f3}
 .btn-primary{background:#222;color:#fff;border-color:#222}
 .btn-primary:hover{background:#444}
+.btn-danger{color:#e24b4a;border-color:#f0c0c0;background:#fff}
+.btn-danger:hover{background:#fff5f5}
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:100;align-items:center;justify-content:center}
 .modal-bg.open{display:flex}
-.modal{background:#fff;border-radius:12px;padding:24px;width:520px;max-width:90vw;max-height:85vh;overflow-y:auto}
-.modal h2{font-size:15px;font-weight:500;margin-bottom:16px}
+.modal{background:#fff;border-radius:12px;padding:24px;width:700px;max-width:95vw;max-height:85vh;overflow-y:auto}
+.modal h2{font-size:15px;font-weight:500;margin-bottom:4px}
+.modal-sub{font-size:12px;color:#888;margin-bottom:16px}
 .form-row{margin-bottom:12px}
 .form-row label{display:block;font-size:12px;color:#666;margin-bottom:4px}
 .form-row input,.form-row select{width:100%;padding:8px 10px;border:0.5px solid #d0d0d0;border-radius:6px;font-size:13px}
@@ -54,8 +58,17 @@ tr:last-child td{border-bottom:none}
 .cost-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid #f0f0f0;font-size:13px}
 .cost-row:last-child{border-bottom:none;font-weight:500}
 .empty{color:#bbb;font-size:13px;padding:32px 0;text-align:center}
-.del-btn{background:none;border:none;cursor:pointer;color:#ccc;padding:0 4px;font-size:14px}
+.del-btn{background:none;border:none;cursor:pointer;color:#ccc;padding:0 4px;font-size:14px;line-height:1}
 .del-btn:hover{color:#e24b4a}
+.target-row{display:grid;grid-template-columns:120px 1fr 80px 100px 100px 32px;gap:8px;align-items:center;margin-bottom:8px}
+.target-row input,.target-row select{padding:7px 8px;border:0.5px solid #d0d0d0;border-radius:6px;font-size:12px;width:100%}
+.target-row-header{display:grid;grid-template-columns:120px 1fr 80px 100px 100px 32px;gap:8px;margin-bottom:8px;padding-bottom:6px;border-bottom:0.5px solid #eee}
+.target-row-header span{font-size:11px;color:#999;font-weight:500}
+.loading{display:flex;align-items:center;justify-content:center;padding:60px;color:#aaa;font-size:13px;gap:8px}
+.spinner{width:18px;height:18px;border:2px solid #e0e0e0;border-top-color:#7f77dd;border-radius:50%;animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:24px;right:24px;background:#222;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:200;opacity:0;transition:opacity 0.3s}
+.toast.show{opacity:1}
 </style>
 </head>
 <body>
@@ -65,7 +78,8 @@ tr:last-child td{border-bottom:none}
     <div style="font-size:16px;font-weight:500">성장전략본부 수익 관리 대시보드</div>
     <div style="font-size:12px;color:#888;margin-top:2px">2025년 연간 목표 및 실적 현황</div>
   </div>
-  <div style="display:flex;gap:8px">
+  <div style="display:flex;gap:8px;align-items:center">
+    <span id="syncStatus" style="font-size:11px;color:#aaa"></span>
     <button class="btn" onclick="openTargetModal()">목표 설정</button>
     <button class="btn btn-primary" onclick="openProjModal()">+ 프로젝트 추가</button>
   </div>
@@ -78,20 +92,15 @@ tr:last-child td{border-bottom:none}
 </div>
 
 <div class="content">
-  <!-- 전체 현황 -->
   <div id="tab-overview">
-    <div class="kpi-grid" id="kpiGrid"></div>
+    <div class="kpi-grid" id="kpiGrid"><div class="loading"><div class="spinner"></div>데이터 불러오는 중...</div></div>
     <div class="section-title">사업부문별 실적 요약</div>
-    <div id="summaryContainer"></div>
+    <div id="summaryContainer"><div class="loading"><div class="spinner"></div></div></div>
   </div>
-
-  <!-- 팀별 목표 -->
   <div id="tab-targets" style="display:none">
     <div class="section-title">팀별 목표 현황</div>
-    <div id="targetContainer"></div>
+    <div id="targetContainer"><div class="loading"><div class="spinner"></div></div></div>
   </div>
-
-  <!-- 프로젝트 관리 -->
   <div id="tab-projects" style="display:none">
     <div class="two-col">
       <div>
@@ -111,21 +120,23 @@ tr:last-child td{border-bottom:none}
 <!-- 목표 설정 모달 -->
 <div class="modal-bg" id="targetModal">
   <div class="modal">
-    <h2>팀 목표 설정</h2>
-    <table>
-      <thead><tr><th style="width:160px">사업항목</th><th>목표건수</th><th>목표금액(만원)</th></tr></thead>
-      <tbody id="targetEditBody"></tbody>
-    </table>
+    <h2>목표 설정</h2>
+    <div class="modal-sub">사업항목별 목표를 설정합니다. 항목 추가/삭제도 가능합니다.</div>
+    <div class="target-row-header">
+      <span>팀</span><span>사업항목명</span><span>목표건수</span><span>목표매출(억원)</span><span>목표이윤(억원)</span><span></span>
+    </div>
+    <div id="targetEditRows"></div>
+    <button class="btn" style="font-size:12px;margin-top:4px" onclick="addTargetRow()">+ 사업항목 추가</button>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('targetModal')">취소</button>
-      <button class="btn btn-primary" onclick="saveTargets()">저장</button>
+      <button class="btn btn-primary" id="saveTargetBtn" onclick="saveTargets()">저장</button>
     </div>
   </div>
 </div>
 
 <!-- 프로젝트 추가/수정 모달 -->
 <div class="modal-bg" id="projModal">
-  <div class="modal">
+  <div class="modal" style="width:520px">
     <h2 id="projModalTitle">프로젝트 추가</h2>
     <div class="form-row"><label>사업항목</label><select id="pm_unit"></select></div>
     <div class="form-row"><label>프로젝트명</label><input type="text" id="pm_name" placeholder="프로젝트명 입력"></div>
@@ -138,346 +149,407 @@ tr:last-child td{border-bottom:none}
     <button class="btn" style="margin-top:8px;font-size:12px" onclick="addCostRow()">+ 비용 항목 추가</button>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('projModal')">취소</button>
-      <button class="btn btn-primary" onclick="saveProject()">저장</button>
+      <button class="btn btn-primary" id="saveProjBtn" onclick="saveProject()">저장</button>
     </div>
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
-const STRUCTURE = {
-  '해외사업팀': ['동반성장사업','입찰용역사업','리서치사업'],
-  '마케팅팀':   ['마케팅에이전시','K-뷰티 글로벌 브랜딩'],
-  '컨설팅팀':   ['수출바우처','전시에이전시','해외영업대행']
-};
-const ALL_UNITS = Object.values(STRUCTURE).flat();
+const SUPABASE_URL = 'https://mxgmvhhdwcnvzhncboix.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z212aGhkd2NudnpobmNib2l4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzODUyNzEsImV4cCI6MjA5MDk2MTI3MX0.wMDAO92ETeSM7oLFyESsNFcpar6gOMPJA4DC-0cBrRg';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let targets = {
-  '동반성장사업':       {cnt:10,amt:50000},
-  '입찰용역사업':       {cnt:8, amt:30000},
-  '리서치사업':         {cnt:15,amt:12000},
-  '마케팅에이전시':     {cnt:12,amt:25000},
-  'K-뷰티 글로벌 브랜딩':{cnt:6,amt:40000},
-  '수출바우처':         {cnt:20,amt:18000},
-  '전시에이전시':       {cnt:8, amt:22000},
-  '해외영업대행':       {cnt:10,amt:15000}
-};
+const TEAMS = ['해외사업팀','마케팅팀','컨설팅팀'];
+const 억 = 10000;
 
-let projects = [
-  {id:1,unit:'동반성장사업',    name:'A기업 동반성장 컨설팅',     revenue:8000, targetProfit:2000,costs:[{name:'인건비',amt:3500},{name:'출장비',amt:400},{name:'기타',amt:200}]},
-  {id:2,unit:'동반성장사업',    name:'B기업 글로벌 진출 지원',    revenue:12000,targetProfit:3500,costs:[{name:'인건비',amt:5000},{name:'외주비',amt:1200},{name:'출장비',amt:600}]},
-  {id:3,unit:'입찰용역사업',    name:'C부처 용역사업',            revenue:9500, targetProfit:2500,costs:[{name:'인건비',amt:4200},{name:'재료비',amt:800},{name:'간접비',amt:500}]},
-  {id:4,unit:'리서치사업',      name:'동남아 시장조사',           revenue:3500, targetProfit:800, costs:[{name:'인건비',amt:1200},{name:'데이터구매',amt:500},{name:'출장비',amt:300}]},
-  {id:5,unit:'마케팅에이전시',  name:'D브랜드 디지털마케팅',      revenue:5500, targetProfit:1500,costs:[{name:'인건비',amt:1800},{name:'광고비',amt:900},{name:'콘텐츠제작',amt:700}]},
-  {id:6,unit:'K-뷰티 글로벌 브랜딩',name:'E화장품 글로벌 브랜딩',revenue:15000,targetProfit:4000,costs:[{name:'인건비',amt:4500},{name:'광고비',amt:2500},{name:'이벤트비',amt:1200},{name:'출장비',amt:800}]},
-  {id:7,unit:'수출바우처',      name:'F중소기업 수출바우처',       revenue:4200, targetProfit:1200,costs:[{name:'인건비',amt:1500},{name:'번역비',amt:300},{name:'기타',amt:200}]},
-  {id:8,unit:'전시에이전시',    name:'G사 해외전시 대행',          revenue:6800, targetProfit:1800,costs:[{name:'인건비',amt:2000},{name:'부스설치비',amt:1200},{name:'출장비',amt:900}]},
-  {id:9,unit:'해외영업대행',    name:'H사 동남아 영업대행',        revenue:7200, targetProfit:2000,costs:[{name:'인건비',amt:2500},{name:'출장비',amt:1100},{name:'현지비용',amt:600}]}
-];
-let nextId = 10;
+let targets = [];
+let projects = [];
 let selectedProjId = null;
 let editingProjId = null;
 let costChart = null;
 let costRowIdx = 0;
+let targetRows = [];
 
 const fmt = n => Number(n||0).toLocaleString('ko-KR');
 const pct = (a,b) => b>0 ? Math.round(a/b*100) : 0;
-const badgeClass = r => r>=1?'g':r>=0.7?'w':'r';
+const bc = r => r>=1?'g':r>=0.7?'w':'r';
 
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+function setSync(msg){document.getElementById('syncStatus').textContent=msg;}
+
+/* ── Supabase CRUD ── */
+async function loadAll(){
+  setSync('불러오는 중...');
+  const [tRes, pRes] = await Promise.all([
+    sb.from('targets').select('*').order('id'),
+    sb.from('projects').select('*').order('id')
+  ]);
+  if(tRes.error||pRes.error){setSync('불러오기 실패');return;}
+  targets = tRes.data;
+  projects = pRes.data.map(p=>({...p, target_profit:p.target_profit, costs:p.costs||[]}));
+  setSync('');
+  buildFilterSelect();
+  renderAll();
+}
+
+async function upsertTarget(row){
+  const {error} = await sb.from('targets').upsert({id:row.id,team:row.team,unit:row.unit,cnt:row.cnt,revenue:row.revenue,profit:row.profit},{onConflict:'id'});
+  return !error;
+}
+async function deleteTarget(id){
+  await sb.from('targets').delete().eq('id',id);
+}
+async function insertTarget(row){
+  const {data,error} = await sb.from('targets').insert({team:row.team,unit:row.unit,cnt:row.cnt,revenue:row.revenue,profit:row.profit}).select().single();
+  return error?null:data;
+}
+async function upsertProject(proj){
+  const payload={unit:proj.unit,name:proj.name,revenue:proj.revenue,target_profit:proj.target_profit,costs:proj.costs};
+  if(proj.id){
+    const {error}=await sb.from('projects').update(payload).eq('id',proj.id);
+    return !error;
+  } else {
+    const {data,error}=await sb.from('projects').insert(payload).select().single();
+    if(!error)projects.push({...data,costs:data.costs||[]});
+    return !error;
+  }
+}
+async function deleteProjectDB(id){
+  await sb.from('projects').delete().eq('id',id);
+}
+
+/* ── 계산 헬퍼 ── */
+function allUnits(){return [...new Set(targets.map(t=>t.unit))];}
+function getStructure(){
+  const s={};
+  TEAMS.forEach(t=>s[t]=[]);
+  targets.forEach(t=>{if(!s[t.team])s[t.team]=[];if(!s[t.team].includes(t.unit))s[t.team].push(t.unit);});
+  return s;
+}
+function getTarget(unit){return targets.find(t=>t.unit===unit)||{cnt:0,revenue:0,profit:0};}
 function getStats(unit){
-  const ps = projects.filter(p=>p.unit===unit);
-  const revenue = ps.reduce((s,p)=>s+Number(p.revenue),0);
-  const cost    = ps.reduce((s,p)=>s+p.costs.reduce((c,x)=>c+Number(x.amt),0),0);
-  return {cnt:ps.length, revenue, cost, profit:revenue-cost};
+  const ps=projects.filter(p=>p.unit===unit);
+  const revenue=ps.reduce((s,p)=>s+Number(p.revenue),0);
+  const cost=ps.reduce((s,p)=>s+(p.costs||[]).reduce((c,x)=>c+Number(x.amt),0),0);
+  return{cnt:ps.length,revenue,cost,profit:revenue-cost};
 }
 
 /* ── KPI ── */
 function renderKPI(){
-  let totRev=0,totTgtProfit=0,totCost=0,totTgtCnt=0,totActCnt=0,totTgtAmt=0;
-  ALL_UNITS.forEach(u=>{const t=targets[u]||{};totTgtCnt+=t.cnt||0;totTgtAmt+=t.amt||0;});
-  projects.forEach(p=>{
-    totRev+=Number(p.revenue);totTgtProfit+=Number(p.targetProfit);
-    totCost+=p.costs.reduce((s,c)=>s+Number(c.amt),0);totActCnt++;
-  });
+  const units=allUnits();
+  let totRev=0,totTgtRev=0,totTgtProfit=0,totCost=0,totTgtCnt=0;
+  units.forEach(u=>{const t=getTarget(u);totTgtCnt+=t.cnt||0;totTgtRev+=(t.revenue||0)*억;totTgtProfit+=(t.profit||0)*억;});
+  projects.forEach(p=>{totRev+=Number(p.revenue);totCost+=(p.costs||[]).reduce((s,c)=>s+Number(c.amt),0);});
   const profit=totRev-totCost;
-  const rAmt=pct(totRev,totTgtAmt), rProfit=pct(profit,totTgtProfit), rCnt=pct(totActCnt,totTgtCnt);
+  const rAmt=totTgtRev>0?totRev/totTgtRev:0;
+  const rProfit=totTgtProfit>0?profit/totTgtProfit:0;
+  const rCnt=totTgtCnt>0?projects.length/totTgtCnt:0;
   document.getElementById('kpiGrid').innerHTML=`
-    <div class="kpi"><div class="kpi-label">전체 매출</div><div class="kpi-val">${fmt(totRev)}<span style="font-size:13px;font-weight:400"> 만원</span></div><span class="badge ${badgeClass(totRev/Math.max(totTgtAmt,1))}" style="margin-top:6px;display:inline-block">${rAmt}% 달성</span></div>
-    <div class="kpi"><div class="kpi-label">예상 실제이익</div><div class="kpi-val" style="color:${profit>=0?'#3b6d11':'#a32d2d'}">${fmt(profit)}<span style="font-size:13px;font-weight:400"> 만원</span></div><span class="badge ${badgeClass(profit/Math.max(totTgtProfit,1))}" style="margin-top:6px;display:inline-block">${rProfit}% 달성</span></div>
-    <div class="kpi"><div class="kpi-label">전체 지출</div><div class="kpi-val">${fmt(totCost)}<span style="font-size:13px;font-weight:400"> 만원</span></div><div style="font-size:11px;color:#888;margin-top:6px">매출 대비 ${pct(totCost,totRev)}%</div></div>
-    <div class="kpi"><div class="kpi-label">수주 건수</div><div class="kpi-val">${totActCnt}<span style="font-size:13px;font-weight:400"> 건</span></div><span class="badge ${badgeClass(totActCnt/Math.max(totTgtCnt,1))}" style="margin-top:6px;display:inline-block">${rCnt}% · 목표 ${totTgtCnt}건</span></div>
+    <div class="kpi"><div class="kpi-label">전체 매출</div><div class="kpi-val">${fmt(totRev)}<span style="font-size:12px;font-weight:400"> 만원</span></div><span class="badge ${bc(rAmt)}" style="margin-top:6px;display:inline-block">${pct(totRev,totTgtRev)}% 달성</span></div>
+    <div class="kpi"><div class="kpi-label">예상 실제이익</div><div class="kpi-val" style="color:${profit>=0?'#3b6d11':'#a32d2d'}">${fmt(profit)}<span style="font-size:12px;font-weight:400"> 만원</span></div><span class="badge ${bc(rProfit)}" style="margin-top:6px;display:inline-block">${pct(profit,totTgtProfit)}% 달성</span></div>
+    <div class="kpi"><div class="kpi-label">전체 지출</div><div class="kpi-val">${fmt(totCost)}<span style="font-size:12px;font-weight:400"> 만원</span></div><div style="font-size:11px;color:#888;margin-top:6px">매출 대비 ${pct(totCost,totRev)}%</div></div>
+    <div class="kpi"><div class="kpi-label">수주 건수</div><div class="kpi-val">${projects.length}<span style="font-size:12px;font-weight:400"> 건</span></div><span class="badge ${bc(rCnt)}" style="margin-top:6px;display:inline-block">${pct(projects.length,totTgtCnt)}% · 목표 ${totTgtCnt}건</span></div>
   `;
 }
 
-/* ── 전체 현황 섹션 카드 ── */
+/* ── 전체 현황 ── */
 function renderSummary(){
+  const structure=getStructure();
   let html='';
-  Object.entries(STRUCTURE).forEach(([team,units])=>{
-    let tCnt=0,tAmt=0,tTgtCnt=0,tTgtAmt=0,tCost=0;
-    units.forEach(u=>{
-      const t=targets[u]||{cnt:0,amt:0}, s=getStats(u);
-      tCnt+=s.cnt; tAmt+=s.revenue; tTgtCnt+=t.cnt; tTgtAmt+=t.amt; tCost+=s.cost;
-    });
-    const tProfit=tAmt-tCost;
-    const rAmt=tTgtAmt>0?tAmt/tTgtAmt:0, rCnt=tTgtCnt>0?tCnt/tTgtCnt:0;
-
-    const unitRows = units.map(u=>{
-      const t=targets[u]||{cnt:0,amt:0}, s=getStats(u);
-      const ur=t.amt>0?s.revenue/t.amt:0, up=Math.round(ur*100);
-      return `<tr>
+  Object.entries(structure).forEach(([team,units])=>{
+    if(!units.length)return;
+    let tCnt=0,tRev=0,tTgtRev=0,tTgtProfit=0,tTgtCnt=0,tCost=0;
+    units.forEach(u=>{const t=getTarget(u),s=getStats(u);tCnt+=s.cnt;tRev+=s.revenue;tTgtCnt+=t.cnt;tTgtRev+=t.revenue*억;tTgtProfit+=t.profit*억;tCost+=s.cost;});
+    const tProfit=tRev-tCost;
+    const rAmt=tTgtRev>0?tRev/tTgtRev:0,rCnt=tTgtCnt>0?tCnt/tTgtCnt:0;
+    const unitRows=units.map(u=>{
+      const t=getTarget(u),s=getStats(u);
+      const ur=t.revenue>0?s.revenue/(t.revenue*억):0,up=Math.round(ur*100);
+      return`<tr>
         <td style="color:#444;padding-left:16px">${u}</td>
-        <td class="num-right">${t.cnt}</td>
-        <td class="num-right">${s.cnt}</td>
-        <td class="num-right">${fmt(t.amt)}</td>
-        <td class="num-right">${fmt(s.revenue)}</td>
-        <td class="num-right" style="color:#666">${fmt(s.cost)}</td>
-        <td class="num-right" style="color:${s.profit>=0?'#3b6d11':'#a32d2d'};font-weight:500">${fmt(s.profit)}</td>
+        <td class="num-right">${t.cnt}</td><td class="num-right">${s.cnt}</td>
+        <td class="num-right">${Number(t.revenue).toFixed(1)}</td>
+        <td class="num-right">${(s.revenue/억).toFixed(2)}</td>
+        <td class="num-right">${Number(t.profit).toFixed(1)}</td>
+        <td class="num-right" style="color:${s.profit>=0?'#3b6d11':'#a32d2d'};font-weight:500">${(s.profit/억).toFixed(2)}</td>
+        <td class="num-right">${fmt(s.cost)}</td>
         <td><div style="display:flex;align-items:center;gap:6px">
           <div class="prog-wrap"><div class="prog-bar" style="width:${Math.min(up,100)}%;background:${ur>=1?'#639922':'#7f77dd'}"></div></div>
           <span style="font-size:11px;min-width:28px">${up}%</span>
-        </div></td>
-      </tr>`;
+        </div></td></tr>`;
     }).join('');
-
-    html+=`
-    <div class="team-card">
+    html+=`<div class="team-card">
       <div class="team-card-header">
         <span class="team-name">${team}</span>
         <div class="team-stats">
-          <span>수주 <b>${tCnt}</b>/${tTgtCnt}건 <span class="badge ${badgeClass(rCnt)}">${Math.round(rCnt*100)}%</span></span>
-          <span>매출 <b>${fmt(tAmt)}</b>/${fmt(tTgtAmt)}만원 <span class="badge ${badgeClass(rAmt)}">${Math.round(rAmt*100)}%</span></span>
-          <span>지출 <b style="color:#666">${fmt(tCost)}</b>만원 <span style="color:#aaa;font-size:11px">(${pct(tCost,tAmt)}%)</span></span>
-          <span>예상이익 <b style="color:${tProfit>=0?'#3b6d11':'#a32d2d'}">${fmt(tProfit)}</b>만원</span>
+          <span>수주 <b>${tCnt}</b>/${tTgtCnt}건 <span class="badge ${bc(rCnt)}">${Math.round(rCnt*100)}%</span></span>
+          <span>매출 <b>${(tRev/억).toFixed(1)}</b>억/${(tTgtRev/억).toFixed(1)}억 <span class="badge ${bc(rAmt)}">${Math.round(rAmt*100)}%</span></span>
+          <span>지출 <b style="color:#666">${(tCost/억).toFixed(1)}</b>억원</span>
+          <span>예상이익 <b style="color:${tProfit>=0?'#3b6d11':'#a32d2d'}">${(tProfit/억).toFixed(1)}</b>억원</span>
         </div>
       </div>
-      <div style="padding:0 16px">
-        <table>
-          <thead><tr>
-            <th style="padding-left:16px">사업항목</th>
-            <th class="num-right">목표건수</th><th class="num-right">실적건수</th>
-            <th class="num-right">목표금액(만원)</th><th class="num-right">실적금액(만원)</th>
-            <th class="num-right">지출(만원)</th><th class="num-right">예상이익(만원)</th>
-            <th style="width:110px">달성률</th>
-          </tr></thead>
-          <tbody>${unitRows}</tbody>
-        </table>
-      </div>
+      <div style="padding:0 16px"><table>
+        <thead><tr>
+          <th style="padding-left:16px">사업항목</th>
+          <th class="num-right">목표건수</th><th class="num-right">실적건수</th>
+          <th class="num-right">목표매출(억)</th><th class="num-right">실적매출(억)</th>
+          <th class="num-right">목표이윤(억)</th><th class="num-right">예상이윤(억)</th>
+          <th class="num-right">지출(만원)</th><th style="width:110px">달성률</th>
+        </tr></thead>
+        <tbody>${unitRows}</tbody>
+      </table></div>
     </div>`;
   });
-  document.getElementById('summaryContainer').innerHTML=html;
+  document.getElementById('summaryContainer').innerHTML=html||'<div class="empty">목표 설정에서 사업항목을 추가해주세요</div>';
 }
 
 /* ── 팀별 목표 탭 ── */
-function renderTargets(){
+function renderTargetTab(){
+  const structure=getStructure();
   let html='';
-  Object.entries(STRUCTURE).forEach(([team,units])=>{
+  Object.entries(structure).forEach(([team,units])=>{
+    if(!units.length)return;
     const rows=units.map(u=>{
-      const t=targets[u]||{cnt:0,amt:0}, s=getStats(u);
-      const ur=t.amt>0?s.revenue/t.amt:0, up=Math.round(ur*100);
-      const cr=t.cnt>0?s.cnt/t.cnt:0, cp=Math.round(cr*100);
-      return `<tr>
+      const t=getTarget(u),s=getStats(u);
+      const ur=t.revenue>0?s.revenue/(t.revenue*억):0,up=Math.round(ur*100);
+      const cr=t.cnt>0?s.cnt/t.cnt:0,cp=Math.round(cr*100);
+      return`<tr>
         <td style="padding-left:16px">${u}</td>
-        <td class="num-right">${t.cnt}</td><td class="num-right">${fmt(t.amt)}</td>
-        <td class="num-right">${s.cnt} <span class="badge ${badgeClass(cr)}">${cp}%</span></td>
-        <td class="num-right">${fmt(s.revenue)} <span class="badge ${badgeClass(ur)}">${up}%</span></td>
+        <td class="num-right">${t.cnt}</td>
+        <td class="num-right">${Number(t.revenue).toFixed(1)}</td>
+        <td class="num-right">${Number(t.profit).toFixed(1)}</td>
+        <td class="num-right">${s.cnt} <span class="badge ${bc(cr)}">${cp}%</span></td>
+        <td class="num-right">${(s.revenue/억).toFixed(2)} <span class="badge ${bc(ur)}">${up}%</span></td>
+        <td class="num-right" style="color:${s.profit>=0?'#3b6d11':'#a32d2d'}">${(s.profit/억).toFixed(2)}</td>
         <td><div style="display:flex;align-items:center;gap:6px">
           <div class="prog-wrap"><div class="prog-bar" style="width:${Math.min(up,100)}%;background:${ur>=1?'#639922':'#7f77dd'}"></div></div>
           <span style="font-size:11px;min-width:28px">${up}%</span>
-        </div></td>
-      </tr>`;
+        </div></td></tr>`;
     }).join('');
-    html+=`
-    <div class="team-card">
+    html+=`<div class="team-card">
       <div class="team-card-header"><span class="team-name">${team}</span></div>
       <div style="padding:0 16px"><table>
         <thead><tr>
           <th style="padding-left:16px">사업항목</th>
-          <th class="num-right">목표건수</th><th class="num-right">목표금액(만원)</th>
-          <th class="num-right">실적건수</th><th class="num-right">실적금액(만원)</th>
+          <th class="num-right">목표건수</th><th class="num-right">목표매출(억)</th><th class="num-right">목표이윤(억)</th>
+          <th class="num-right">실적건수</th><th class="num-right">실적매출(억)</th><th class="num-right">예상이윤(억)</th>
           <th style="width:110px">달성률</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table></div>
     </div>`;
   });
-  document.getElementById('targetContainer').innerHTML=html;
+  document.getElementById('targetContainer').innerHTML=html||'<div class="empty">목표 설정에서 사업항목을 추가해주세요</div>';
+}
+
+/* ── 목표 설정 모달 ── */
+function openTargetModal(){
+  targetRows=targets.map(t=>({...t}));
+  renderTargetEditRows();
+  document.getElementById('targetModal').classList.add('open');
+}
+function renderTargetEditRows(){
+  document.getElementById('targetEditRows').innerHTML=targetRows.map((row,i)=>`
+    <div class="target-row">
+      <select onchange="targetRows[${i}].team=this.value">
+        ${TEAMS.map(t=>`<option value="${t}" ${t===row.team?'selected':''}>${t}</option>`).join('')}
+      </select>
+      <input type="text" value="${row.unit||''}" placeholder="사업항목명" onchange="targetRows[${i}].unit=this.value">
+      <input type="number" value="${row.cnt||0}" min="0" onchange="targetRows[${i}].cnt=Number(this.value)||0">
+      <input type="number" value="${row.revenue||0}" step="0.1" min="0" onchange="targetRows[${i}].revenue=Number(this.value)||0">
+      <input type="number" value="${row.profit||0}" step="0.1" min="0" onchange="targetRows[${i}].profit=Number(this.value)||0">
+      <button class="del-btn" onclick="removeTargetRow(${i})">✕</button>
+    </div>`).join('');
+}
+function addTargetRow(){
+  targetRows.push({team:TEAMS[0],unit:'',cnt:0,revenue:0,profit:0});
+  renderTargetEditRows();
+}
+function removeTargetRow(i){targetRows.splice(i,1);renderTargetEditRows();}
+
+async function saveTargets(){
+  // collect latest input values
+  const rows=document.getElementById('targetEditRows').querySelectorAll('.target-row');
+  rows.forEach((row,i)=>{
+    const sel=row.querySelector('select');
+    const ins=row.querySelectorAll('input');
+    targetRows[i].team=sel.value;
+    targetRows[i].unit=ins[0].value.trim();
+    targetRows[i].cnt=Number(ins[1].value)||0;
+    targetRows[i].revenue=Number(ins[2].value)||0;
+    targetRows[i].profit=Number(ins[3].value)||0;
+  });
+  const valid=targetRows.filter(r=>r.unit);
+  const btn=document.getElementById('saveTargetBtn');
+  btn.textContent='저장 중...';btn.disabled=true;
+  setSync('저장 중...');
+
+  // delete removed
+  const removedIds=targets.filter(t=>!valid.find(v=>v.id===t.id)).map(t=>t.id).filter(Boolean);
+  await Promise.all(removedIds.map(id=>deleteTarget(id)));
+
+  // upsert existing / insert new
+  for(const row of valid){
+    if(row.id){await upsertTarget(row);}
+    else{const res=await insertTarget(row);if(res)row.id=res.id;}
+  }
+
+  btn.textContent='저장';btn.disabled=false;
+  closeModal('targetModal');
+  await loadAll();
+  showToast('목표가 저장되었습니다');
 }
 
 /* ── 프로젝트 탭 ── */
+function buildFilterSelect(){
+  document.getElementById('filterUnit').innerHTML=`<option value="">전체 사업항목</option>`+allUnits().map(u=>`<option value="${u}">${u}</option>`).join('');
+}
 function renderProjects(){
   const filter=document.getElementById('filterUnit').value;
   const ps=filter?projects.filter(p=>p.unit===filter):projects;
   const list=document.getElementById('projList');
   if(!ps.length){list.innerHTML=`<div class="empty">프로젝트가 없습니다</div>`;return;}
   list.innerHTML=ps.map(p=>{
-    const cost=p.costs.reduce((s,c)=>s+Number(c.amt),0);
+    const cost=(p.costs||[]).reduce((s,c)=>s+Number(c.amt),0);
     const ap=Number(p.revenue)-cost;
-    const r=Number(p.targetProfit)>0?ap/Number(p.targetProfit):0;
+    const r=Number(p.target_profit)>0?ap/Number(p.target_profit):0;
     return`<div class="proj-card ${selectedProjId===p.id?'selected':''}" onclick="selectProject(${p.id})">
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
         <div><div style="font-weight:500;font-size:13px">${p.name}</div>
           <div style="font-size:11px;color:#888;margin-top:2px">${p.unit}</div></div>
         <div style="text-align:right">
           <div style="font-size:13px;font-weight:500">${fmt(p.revenue)}만원</div>
-          <span class="badge ${badgeClass(r)}" style="font-size:10px;margin-top:3px;display:inline-block">이익률 ${Math.round(r*100)}%</span>
+          <span class="badge ${bc(r)}" style="font-size:10px;margin-top:3px;display:inline-block">이익률 ${Math.round(r*100)}%</span>
         </div>
       </div>
     </div>`;
   }).join('');
 }
-
-function selectProject(id){
-  selectedProjId=id;
-  renderProjects();
-  renderDetail();
-}
-
+function selectProject(id){selectedProjId=id;renderProjects();renderDetail();}
 function renderDetail(){
   const el=document.getElementById('projDetail');
   const p=projects.find(x=>x.id===selectedProjId);
   if(!p){el.innerHTML=`<div class="empty">프로젝트를 선택하면<br>세부 내역이 표시됩니다</div>`;return;}
-  const cost=p.costs.reduce((s,c)=>s+Number(c.amt),0);
+  const cost=(p.costs||[]).reduce((s,c)=>s+Number(c.amt),0);
   const ap=Number(p.revenue)-cost;
-  const r=Number(p.targetProfit)>0?ap/Number(p.targetProfit):0;
-
+  const r=Number(p.target_profit)>0?ap/Number(p.target_profit):0;
   el.innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
       <div><div style="font-weight:500;font-size:14px">${p.name}</div>
         <div style="font-size:11px;color:#888;margin-top:2px">${p.unit}</div></div>
       <div style="display:flex;gap:6px">
         <button class="btn" style="font-size:11px;padding:4px 10px" onclick="editProject(${p.id})">수정</button>
-        <button class="btn" style="font-size:11px;padding:4px 10px;color:#e24b4a;border-color:#f0c0c0" onclick="deleteProject(${p.id})">삭제</button>
+        <button class="btn btn-danger" style="font-size:11px;padding:4px 10px" onclick="deleteProject(${p.id})">삭제</button>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
-      <div class="kpi" style="padding:10px 12px"><div class="kpi-label">매출</div><div style="font-size:16px;font-weight:500">${fmt(p.revenue)}<span style="font-size:11px;font-weight:400"> 만원</span></div></div>
-      <div class="kpi" style="padding:10px 12px"><div class="kpi-label">타겟이익</div><div style="font-size:16px;font-weight:500">${fmt(p.targetProfit)}<span style="font-size:11px;font-weight:400"> 만원</span></div></div>
-      <div class="kpi" style="padding:10px 12px"><div class="kpi-label">총 지출</div><div style="font-size:16px;font-weight:500">${fmt(cost)}<span style="font-size:11px;font-weight:400"> 만원</span></div></div>
+      <div class="kpi" style="padding:10px 12px"><div class="kpi-label">매출</div><div style="font-size:15px;font-weight:500">${fmt(p.revenue)}<span style="font-size:11px;font-weight:400"> 만원</span></div></div>
+      <div class="kpi" style="padding:10px 12px"><div class="kpi-label">타겟이익</div><div style="font-size:15px;font-weight:500">${fmt(p.target_profit)}<span style="font-size:11px;font-weight:400"> 만원</span></div></div>
+      <div class="kpi" style="padding:10px 12px"><div class="kpi-label">총 지출</div><div style="font-size:15px;font-weight:500">${fmt(cost)}<span style="font-size:11px;font-weight:400"> 만원</span></div></div>
       <div class="kpi" style="padding:10px 12px"><div class="kpi-label">예상 실제이익</div>
-        <div style="font-size:16px;font-weight:500;color:${ap>=0?'#3b6d11':'#a32d2d'}">${fmt(ap)}<span style="font-size:11px;font-weight:400"> 만원</span></div>
-        <span class="badge ${badgeClass(r)}" style="margin-top:4px;display:inline-block;font-size:10px">${Math.round(r*100)}% 달성</span>
+        <div style="font-size:15px;font-weight:500;color:${ap>=0?'#3b6d11':'#a32d2d'}">${fmt(ap)}<span style="font-size:11px;font-weight:400"> 만원</span></div>
+        <span class="badge ${bc(r)}" style="margin-top:4px;display:inline-block;font-size:10px">${Math.round(r*100)}% 달성</span>
       </div>
     </div>
     <div class="section-title">세부 비용 내역</div>
     <div class="chart-wrap"><canvas id="costChart"></canvas></div>
-    <div>${p.costs.map(c=>`<div class="cost-row"><span>${c.name}</span><span>${fmt(c.amt)} 만원</span></div>`).join('')}
+    <div>${(p.costs||[]).map(c=>`<div class="cost-row"><span>${c.name}</span><span>${fmt(c.amt)} 만원</span></div>`).join('')}
       <div class="cost-row"><span>합계</span><span>${fmt(cost)} 만원</span></div>
-    </div>
-  `;
-
+    </div>`;
   if(costChart){costChart.destroy();costChart=null;}
-  costChart=new Chart(document.getElementById('costChart'),{
-    type:'doughnut',
-    data:{labels:p.costs.map(c=>c.name),datasets:[{data:p.costs.map(c=>Number(c.amt)),backgroundColor:['#7f77dd','#1d9e75','#d85a30','#378add','#ba7517','#d4537e','#639922'],borderWidth:2,borderColor:'#fff'}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12,padding:8}}}}
-  });
+  if(p.costs&&p.costs.length){
+    costChart=new Chart(document.getElementById('costChart'),{
+      type:'doughnut',
+      data:{labels:p.costs.map(c=>c.name),datasets:[{data:p.costs.map(c=>Number(c.amt)),backgroundColor:['#7f77dd','#1d9e75','#d85a30','#378add','#ba7517','#d4537e','#639922'],borderWidth:2,borderColor:'#fff'}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12,padding:8}}}}
+    });
+  }
 }
-
-function deleteProject(id){
+async function deleteProject(id){
   if(!confirm('이 프로젝트를 삭제하시겠습니까?'))return;
+  await deleteProjectDB(id);
   projects=projects.filter(p=>p.id!==id);
   selectedProjId=null;
   renderAll();
+  showToast('프로젝트가 삭제되었습니다');
 }
-
-function editProject(id){
-  const p=projects.find(x=>x.id===id);
-  if(!p)return;
-  editingProjId=id;
-  document.getElementById('projModalTitle').textContent='프로젝트 수정';
-  buildUnitSelect(); document.getElementById('pm_unit').value=p.unit;
-  document.getElementById('pm_name').value=p.name;
-  document.getElementById('pm_revenue').value=p.revenue;
-  document.getElementById('pm_targetProfit').value=p.targetProfit;
-  document.getElementById('costItems').innerHTML='';
-  costRowIdx=0;
-  p.costs.forEach(c=>addCostRow(c.name,c.amt));
-  document.getElementById('projModal').classList.add('open');
-}
-
-function addCostRow(name='',amt=''){
-  const id='cr_'+(costRowIdx++);
-  const d=document.createElement('div');
-  d.id=id; d.style.cssText='display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center';
-  d.innerHTML=`<input type="text" placeholder="항목명" value="${name}" style="padding:7px 10px;border:0.5px solid #d0d0d0;border-radius:6px;font-size:13px">
-    <input type="number" placeholder="금액(만원)" value="${amt}" style="padding:7px 10px;border:0.5px solid #d0d0d0;border-radius:6px;font-size:13px">
-    <button class="del-btn" onclick="document.getElementById('${id}').remove()">✕</button>`;
-  document.getElementById('costItems').appendChild(d);
-}
-
 function buildUnitSelect(){
-  document.getElementById('pm_unit').innerHTML=ALL_UNITS.map(u=>`<option value="${u}">${u}</option>`).join('');
+  document.getElementById('pm_unit').innerHTML=allUnits().map(u=>`<option value="${u}">${u}</option>`).join('');
 }
-
 function openProjModal(){
   editingProjId=null;
   document.getElementById('projModalTitle').textContent='프로젝트 추가';
   buildUnitSelect();
   ['pm_name','pm_revenue','pm_targetProfit'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('costItems').innerHTML='';
-  costRowIdx=0; addCostRow('인건비','');
+  document.getElementById('costItems').innerHTML='';costRowIdx=0;addCostRow('인건비','');
   document.getElementById('projModal').classList.add('open');
 }
-
-function saveProject(){
+function editProject(id){
+  const p=projects.find(x=>x.id===id);if(!p)return;
+  editingProjId=id;
+  document.getElementById('projModalTitle').textContent='프로젝트 수정';
+  buildUnitSelect();document.getElementById('pm_unit').value=p.unit;
+  document.getElementById('pm_name').value=p.name;
+  document.getElementById('pm_revenue').value=p.revenue;
+  document.getElementById('pm_targetProfit').value=p.target_profit;
+  document.getElementById('costItems').innerHTML='';costRowIdx=0;
+  (p.costs||[]).forEach(c=>addCostRow(c.name,c.amt));
+  document.getElementById('projModal').classList.add('open');
+}
+function addCostRow(name='',amt=''){
+  const id='cr_'+(costRowIdx++);
+  const d=document.createElement('div');
+  d.id=id;d.style.cssText='display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center';
+  d.innerHTML=`<input type="text" placeholder="항목명" value="${name}" style="padding:7px 10px;border:0.5px solid #d0d0d0;border-radius:6px;font-size:13px">
+    <input type="number" placeholder="금액(만원)" value="${amt}" style="padding:7px 10px;border:0.5px solid #d0d0d0;border-radius:6px;font-size:13px">
+    <button class="del-btn" onclick="document.getElementById('${id}').remove()">✕</button>`;
+  document.getElementById('costItems').appendChild(d);
+}
+async function saveProject(){
   const unit=document.getElementById('pm_unit').value;
   const name=document.getElementById('pm_name').value.trim();
   if(!name){alert('프로젝트명을 입력해주세요');return;}
   const revenue=Number(document.getElementById('pm_revenue').value)||0;
-  const targetProfit=Number(document.getElementById('pm_targetProfit').value)||0;
+  const target_profit=Number(document.getElementById('pm_targetProfit').value)||0;
   const costs=[];
   document.getElementById('costItems').querySelectorAll('[id^=cr_]').forEach(row=>{
     const ins=row.querySelectorAll('input');
-    if(ins[0]&&ins[0].value.trim()) costs.push({name:ins[0].value.trim(),amt:Number(ins[1].value)||0});
+    if(ins[0]&&ins[0].value.trim())costs.push({name:ins[0].value.trim(),amt:Number(ins[1].value)||0});
   });
+  const btn=document.getElementById('saveProjBtn');
+  btn.textContent='저장 중...';btn.disabled=true;
+  const proj={id:editingProjId||null,unit,name,revenue,target_profit,costs};
   if(editingProjId){
-    const i=projects.findIndex(p=>p.id===editingProjId);
-    projects[i]={...projects[i],unit,name,revenue,targetProfit,costs};
-    selectedProjId=editingProjId;
+    const {error}=await sb.from('projects').update({unit,name,revenue,target_profit,costs}).eq('id',editingProjId);
+    if(!error){const i=projects.findIndex(p=>p.id===editingProjId);projects[i]={...projects[i],unit,name,revenue,target_profit,costs};selectedProjId=editingProjId;}
   } else {
-    projects.push({id:nextId++,unit,name,revenue,targetProfit,costs});
+    const {data,error}=await sb.from('projects').insert({unit,name,revenue,target_profit,costs}).select().single();
+    if(!error)projects.push({...data,costs:data.costs||[]});
   }
-  closeModal('projModal'); renderAll();
-}
-
-function openTargetModal(){
-  document.getElementById('targetEditBody').innerHTML=ALL_UNITS.map(u=>{
-    const t=targets[u]||{cnt:0,amt:0};
-    const k=u.replace(/[^a-z0-9]/gi,'_');
-    return`<tr><td style="padding:6px 8px;font-size:13px">${u}</td>
-      <td><input type="number" id="tc_${k}" value="${t.cnt}" style="width:70px;padding:5px 8px;border:0.5px solid #d0d0d0;border-radius:4px;font-size:13px"></td>
-      <td><input type="number" id="ta_${k}" value="${t.amt}" style="width:110px;padding:5px 8px;border:0.5px solid #d0d0d0;border-radius:4px;font-size:13px"></td></tr>`;
-  }).join('');
-  document.getElementById('targetModal').classList.add('open');
-}
-
-function saveTargets(){
-  ALL_UNITS.forEach(u=>{
-    const k=u.replace(/[^a-z0-9]/gi,'_');
-    targets[u]={cnt:Number(document.getElementById('tc_'+k).value)||0, amt:Number(document.getElementById('ta_'+k).value)||0};
-  });
-  closeModal('targetModal'); renderAll();
+  btn.textContent='저장';btn.disabled=false;
+  closeModal('projModal');renderAll();
+  showToast('프로젝트가 저장되었습니다');
 }
 
 function closeModal(id){document.getElementById(id).classList.remove('open')}
-
 function switchTab(tab,btn){
   ['overview','targets','projects'].forEach(t=>document.getElementById('tab-'+t).style.display=t===tab?'block':'none');
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
 }
-
-function buildFilterSelect(){
-  document.getElementById('filterUnit').innerHTML=`<option value="">전체 사업항목</option>`+ALL_UNITS.map(u=>`<option value="${u}">${u}</option>`).join('');
-}
-
 function renderAll(){
-  renderKPI(); renderSummary(); renderTargets(); renderProjects();
-  if(selectedProjId) renderDetail();
+  renderKPI();renderSummary();renderTargetTab();renderProjects();
+  if(selectedProjId)renderDetail();
 }
 
 document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
-buildFilterSelect();
-renderAll();
+loadAll();
 </script>
 </body>
 </html>
