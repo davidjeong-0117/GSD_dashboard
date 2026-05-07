@@ -114,6 +114,7 @@ tr:last-child td{border-bottom:none}
   <button class="tab active" onclick="switchTab('overview',this)">전체 현황</button>
   <button class="tab" onclick="switchTab('targets',this)">팀별 목표</button>
   <button class="tab" onclick="switchTab('projects',this)">프로젝트 관리</button>
+  <button class="tab" onclick="switchTab('sheet',this)">구글시트 현황</button>
   <button class="tab" onclick="switchTab('cashflow',this)">현금흐름</button>
 </div>
 
@@ -141,7 +142,49 @@ tr:last-child td{border-bottom:none}
       <div id="projDetail"><div class="empty">프로젝트를 선택하면<br>세부 내역이 표시됩니다</div></div>
     </div>
   </div>
-  <div id="tab-cashflow" style="display:none">
+  <!-- 구글시트 현황 탭 -->
+  <div id="tab-sheet" style="display:none">
+    <div class="kpi-grid" id="sheetKpiGrid"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div class="section-title" style="margin:0;border:none;padding:0">2026년 프로젝트 현황 (정영운)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="sheetFilterTeam" style="font-size:12px;padding:5px 8px;border:0.5px solid #d0d0d0;border-radius:6px;color:#222;background:#fff" onchange="renderSheet()">
+          <option value="">전체 팀</option>
+        </select>
+        <select id="sheetFilterType" style="font-size:12px;padding:5px 8px;border:0.5px solid #d0d0d0;border-radius:6px;color:#222;background:#fff" onchange="renderSheet()">
+          <option value="">전체 구분</option>
+          <option value="BGK">BGK</option>
+          <option value="BP">BP</option>
+          <option value="IN">IN</option>
+        </select>
+      </div>
+    </div>
+    <div class="table-wrap" style="padding:0">
+      <table id="sheetTable" style="min-width:860px">
+        <thead>
+          <tr style="background:#f8f8f6">
+            <th>구분</th>
+            <th>팀</th>
+            <th style="min-width:100px">고객사</th>
+            <th style="min-width:180px">용역명</th>
+            <th>코드</th>
+            <th class="num-right">총금액(원)</th>
+            <th class="num-right">타겟순매출(원)</th>
+            <th class="num-right">실순매출(원)</th>
+            <th class="text-center">수금</th>
+            <th class="text-center">완료</th>
+            <th class="text-center">선수금 예정</th>
+            <th class="text-center">선수금 수취</th>
+            <th class="text-center">잔금 예정</th>
+            <th class="text-center">잔금 수취</th>
+          </tr>
+        </thead>
+        <tbody id="sheetTableBody"><tr><td colspan="14" class="empty">로딩 중...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  
     <div class="kpi-grid" id="cfKpiGrid"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
       <div class="section-title" style="margin:0;border:none;padding:0">계약별 현금흐름</div>
@@ -285,6 +328,33 @@ tr:last-child td{border-bottom:none}
 const SUPABASE_URL='https://mxgmvhhdwcnvzhncboix.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z212aGhkd2NudnpobmNib2l4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzODUyNzEsImV4cCI6MjA5MDk2MTI3MX0.wMDAO92ETeSM7oLFyESsNFcpar6gOMPJA4DC-0cBrRg';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const SHEET_API='https://script.google.com/macros/s/AKfycby0d2Uqpm2RhOSZs8qQsrmy5ASdxa3W5807nksI-1DjpcC_kAxn223RGyatfRXAJIaV/exec';
+let sheetProjects=[];
+
+function fetchSheetJSONP(){
+  return new Promise((resolve)=>{
+    const cbName='sheetCb_'+Date.now();
+    const script=document.createElement('script');
+    const timeout=setTimeout(()=>{
+      delete window[cbName];
+      document.body.removeChild(script);
+      resolve({success:false,data:[]});
+    },10000);
+    window[cbName]=(data)=>{
+      clearTimeout(timeout);
+      delete window[cbName];
+      document.body.removeChild(script);
+      resolve(data);
+    };
+    script.src=SHEET_API+'?callback='+cbName;
+    script.onerror=()=>{
+      clearTimeout(timeout);
+      delete window[cbName];
+      resolve({success:false,data:[]});
+    };
+    document.body.appendChild(script);
+  });
+}
 const TEAMS=['해외사업팀','마케팅팀','컨설팅팀'];
 const TODAY=new Date(); TODAY.setHours(0,0,0,0);
 
@@ -314,15 +384,17 @@ function setSync(msg){document.getElementById('syncStatus').textContent=msg;}
 /* ── Supabase ── */
 async function loadAll(){
   setSync('동기화 중...');
-  const [tRes,pRes,cRes]=await Promise.all([
+  const [tRes,pRes,cRes,sheetRes]=await Promise.all([
     sb.from('targets').select('*').order('id'),
     sb.from('projects').select('*').order('id'),
-    sb.from('cashflow').select('*').order('id')
+    sb.from('cashflow').select('*').order('id'),
+    fetchSheetJSONP()
   ]);
   if(tRes.error||pRes.error){setSync('오류');return;}
   targets=tRes.data;
   projects=pRes.data.map(p=>({...p,costs:p.costs||[]}));
   cashflows=cRes.data||[];
+  sheetProjects=sheetRes.success?sheetRes.data:[];
   setSync('');
   buildFilterSelects();
   renderAll();
@@ -750,7 +822,7 @@ async function saveProject(){
 }
 
 function closeModal(id){document.getElementById(id).classList.remove('open')}
-function renderAll(){renderKPI();renderSummary();renderTargetTab();renderProjects();renderCashflow();if(selectedProjId)renderDetail();}
+function renderAll(){renderKPI();renderSummary();renderTargetTab();renderProjects();renderCashflow();renderSheet();buildSheetFilters();if(selectedProjId)renderDetail();}
 document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
 loadAll();
 </script>
